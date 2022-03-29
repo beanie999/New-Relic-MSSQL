@@ -1,0 +1,37 @@
+queries:
+  - query: NewRelic_Wait_States @seconds = 15
+    prefix: MSSQL_
+  - query: NewRelic_Top_SQL @seconds = 15, @num_sql = 20
+    prefix: MSSQL_
+  - query: >-
+      SELECT
+        'Locks' as customType,
+        @@SERVERNAME AS [sql_hostname],
+        t1.[resource_type],
+        db_name(resource_database_id) AS [database_name],
+        t1.resource_associated_entity_id AS [block_object],
+        t1.[request_mode],
+        t1.request_session_id AS [waiter_spid],
+        (
+          SELECT [text] FROM sys.dm_exec_requests AS r
+          CROSS APPLY sys.dm_exec_sql_text(r.sql_handle)
+          WHERE r.session_id = t1.request_session_id
+        ) AS [waiter_text],
+        t2.blocking_session_id AS [blocking_spid],
+        (
+          SELECT TOP 1 request_mode
+          FROM sys.dm_tran_locks t1
+          JOIN sys.dm_os_waiting_tasks t2 ON t1.request_session_id = t2.blocking_session_id
+          WHERE request_mode NOT LIKE 'IX%'
+          AND resource_type NOT LIKE 'DATABASE'
+          AND resource_type NOT LIKE 'METADATA%'
+          ORDER BY request_mode DESC
+        ) AS [blocking_lock],
+        (
+          SELECT [text] FROM sys.sysprocesses AS p
+          CROSS APPLY sys.dm_exec_sql_text(p.sql_handle)
+          WHERE p.spid = t2.blocking_session_id
+        ) AS [blocking_text]
+      FROM sys.dm_tran_locks AS t1, sys.dm_os_waiting_tasks AS t2
+      WHERE t1.lock_owner_address = t2.resource_address;
+    prefix: MSSQL_
