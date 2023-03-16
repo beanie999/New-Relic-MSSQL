@@ -69,7 +69,7 @@ BEGIN
   SELECT TOP (@num_sql)
     @@SERVERNAME AS sql_hostname, ISNULL(DB_NAME(qt.dbid),'') as database_name,
     LEFT(qt.[text], 50) as short_text, CAST(qp.query_plan AS VARCHAR(MAX)) as query_plan,
-    tmp.sql_handle, tmp.max_plan_generation_num, tmp.execution_count, tmp.worker_time/1000 as worker_time_ms,
+    tmp.sql_handle, tmp.plan_handle, tmp.max_plan_generation_num, tmp.execution_count, tmp.worker_time/1000 as worker_time_ms,
     tmp.physical_reads, tmp.logical_writes, tmp.logical_reads, tmp.clr_time/1000 as clr_time_ms,
     tmp.elapsed_time/1000 as elapsed_time_ms, tmp.rows, tmp.degree_parallel, qt.text as complete_text
   FROM #temp_rtn_query_stats tmp
