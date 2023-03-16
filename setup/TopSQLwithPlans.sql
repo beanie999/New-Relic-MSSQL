@@ -71,7 +71,7 @@ BEGIN
     LEFT(qt.[text], 50) as short_text, CAST(qp.query_plan AS VARCHAR(MAX)) as query_plan,
     tmp.sql_handle, tmp.max_plan_generation_num, tmp.execution_count, tmp.worker_time/1000 as worker_time_ms,
     tmp.physical_reads, tmp.logical_writes, tmp.logical_reads, tmp.clr_time/1000 as clr_time_ms,
-    tmp.elapsed_time/1000 as elapsed_time_ms, tmp.rows, tmp.degree_parallel, qt.text as sql_text
+    tmp.elapsed_time/1000 as elapsed_time_ms, tmp.rows, tmp.degree_parallel, qt.text as complete_text
   FROM #temp_rtn_query_stats tmp
   CROSS APPLY sys.dm_exec_sql_text(tmp.plan_handle) as qt
   CROSS APPLY sys.dm_exec_text_query_plan(tmp.plan_handle, 0, -1) as qp
