@@ -1,0 +1,482 @@
+{
+  "name": "SQL Server",
+  "description": null,
+  "permissions": "PUBLIC_READ_WRITE",
+  "pages": [
+    {
+      "name": "Instance level",
+      "description": null,
+      "widgets": [
+        {
+          "title": "Top instances",
+          "layout": {
+            "column": 1,
+            "row": 1,
+            "width": 3,
+            "height": 3
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.bar"
+          },
+          "rawConfiguration": {
+            "facet": {
+              "showOtherSeries": false
+            },
+            "nrqlQueries": [
+              {
+                "accountId": <YOUR ACCOUNT ID>,
+                "query": "FROM MssqlCustomQuerySample SELECT sum(MSSQL_elapsed_time_ms)/1000 AS 'Elapsed Time (sec)' FACET entityName"
+              }
+            ]
+          }
+        },
+        {
+          "title": "Instance Wait Times (sec)",
+          "layout": {
+            "column": 4,
+            "row": 1,
+            "width": 6,
+            "height": 3
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.area"
+          },
+          "rawConfiguration": {
+            "facet": {
+              "showOtherSeries": false
+            },
+            "legend": {
+              "enabled": true
+            },
+            "nrqlQueries": [
+              {
+                "accountId": <YOUR ACCOUNT ID>,
+                "query": "FROM MssqlCustomQuerySample SELECT sum(MSSQL_wait_time_ms)/1000 FACET MSSQL_wait_type WHERE MSSQL_customType = 'WaitState' TIMESERIES LIMIT MAX WHERE MSSQL_wait_type NOT IN ('KSOURCE_WAKEUP', 'LAZYWRITER_SLEEP', 'LOGMGR_QUEUE', 'MEMORY_ALLOCATION_EXT', 'ONDEMAND_TASK_QUEUE', 'PARALLEL_REDO_DRAIN_WORKER', 'PARALLEL_REDO_LOG_CACHE', 'PARALLEL_REDO_TRAN_LIST', 'PARALLEL_REDO_WORKER_SYNC', 'PARALLEL_REDO_WORKER_WAIT_WORK', 'PREEMPTIVE_OS_FLUSHFILEBUFFERS', 'PREEMPTIVE_XE_GETTARGETSTATE', 'PVS_PREALLOCATE', 'PWAIT_ALL_COMPONENTS_INITIALIZED', 'PWAIT_DIRECTLOGCONSUMER_GETNEXT', 'QDS_PERSIST_TASK_MAIN_LOOP_SLEEP', 'QDS_ASYNC_QUEUE', 'QDS_CLEANUP_STALE_QUERIES_TASK_MAIN_LOOP_SLEEP', 'QDS_SHUTDOWN_QUEUE', 'REDO_THREAD_PENDING_WORK', 'REQUEST_FOR_DEADLOCK_SEARCH', 'RESOURCE_QUEUE', 'SERVER_IDLE_CHECK', 'SLEEP_BPOOL_FLUSH', 'SLEEP_DBSTARTUP', 'SLEEP_DCOMSTARTUP', 'SLEEP_MASTERDBREADY', 'SLEEP_MASTERMDREADY', 'SLEEP_MASTERUPGRADED', 'SLEEP_MSDBSTARTUP', 'SLEEP_SYSTEMTASK', 'SLEEP_TASK', 'SLEEP_TEMPDBSTARTUP', 'SNI_HTTP_ACCEPT', 'SOS_WORK_DISPATCHER', 'SP_SERVER_DIAGNOSTICS_SLEEP', 'SQLTRACE_BUFFER_FLUSH', 'SQLTRACE_INCREMENTAL_FLUSH_SLEEP', 'SQLTRACE_WAIT_ENTRIES', 'VDI_CLIENT_OTHER', 'WAIT_FOR_RESULTS', 'WAITFOR', 'WAITFOR_TASKSHUTDOWN', 'WAIT_XTP_RECOVERY', 'WAIT_XTP_HOST_WAIT', 'WAIT_XTP_OFFLINE_CKPT_NEW_LOG', 'WAIT_XTP_CKPT_CLOSE', 'XE_DISPATCHER_JOIN', 'XE_DISPATCHER_WAIT', 'XE_TIMER_EVENT', 'PWAIT_EXTENSIBILITY_CLEANUP_TASK', 'HADR_FILESTREAM_IOMGR_IOCOMPLETION', 'DIRTY_PAGE_POLL', 'CHECKPOINT_QUEUE', 'FT_IFTS_SCHEDULER_IDLE_WAIT', 'BROKER_TO_FLUSH', 'BROKER_TASK_STOP') AND MSSQL_wait_time_ms > 0"
+              }
+            ]
+          }
+        },
+        {
+          "title": "Buffer cache hit percentage",
+          "layout": {
+            "column": 10,
+            "row": 1,
+            "width": 3,
+            "height": 3
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.area"
+          },
+          "rawConfiguration": {
+            "facet": {
+              "showOtherSeries": false
+            },
+            "legend": {
+              "enabled": true
+            },
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  <YOUR ACCOUNT ID>
+                ],
+                "query": "SELECT average(`system.bufferPoolHitPercent`) as 'Cache hit' FROM MssqlInstanceSample WHERE `system.bufferPoolHitPercent` <= 100 TIMESERIES auto"
+              }
+            ],
+            "platformOptions": {
+              "ignoreTimeRange": false
+            }
+          }
+        },
+        {
+          "title": "Top databases",
+          "layout": {
+            "column": 1,
+            "row": 4,
+            "width": 3,
+            "height": 3
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.bar"
+          },
+          "rawConfiguration": {
+            "facet": {
+              "showOtherSeries": false
+            },
+            "nrqlQueries": [
+              {
+                "accountId": <YOUR ACCOUNT ID>,
+                "query": "FROM MssqlCustomQuerySample SELECT sum(MSSQL_elapsed_time_ms)/1000 AS 'Elapsed Time (sec)' FACET MSSQL_database_name WHERE MSSQL_database_name != ''"
+              }
+            ]
+          }
+        },
+        {
+          "title": "SQL compilations and re-compilations",
+          "layout": {
+            "column": 4,
+            "row": 4,
+            "width": 3,
+            "height": 3
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.area"
+          },
+          "rawConfiguration": {
+            "facet": {
+              "showOtherSeries": false
+            },
+            "legend": {
+              "enabled": true
+            },
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  <YOUR ACCOUNT ID>
+                ],
+                "query": "SELECT average(`stats.sqlCompilations`) as `Compilations`, average(`stats.sqlRecompilationsPerSecond`) as `Re-compilations` FROM MssqlInstanceSample WHERE `stats.sqlRecompilationsPerSecond` >= 0 TIMESERIES auto"
+              }
+            ],
+            "platformOptions": {
+              "ignoreTimeRange": false
+            }
+          }
+        },
+        {
+          "title": "Lock waits",
+          "layout": {
+            "column": 7,
+            "row": 4,
+            "width": 3,
+            "height": 3
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.line"
+          },
+          "rawConfiguration": {
+            "facet": {
+              "showOtherSeries": false
+            },
+            "legend": {
+              "enabled": true
+            },
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  <YOUR ACCOUNT ID>
+                ],
+                "query": "SELECT average(`stats.lockWaitsPerSecond`) as 'Times' FROM MssqlInstanceSample WHERE `stats.lockWaitsPerSecond` >= 0 TIMESERIES auto"
+              }
+            ],
+            "platformOptions": {
+              "ignoreTimeRange": false
+            },
+            "yAxisLeft": {
+              "zero": true
+            }
+          }
+        },
+        {
+          "title": "Number of blocked processes",
+          "layout": {
+            "column": 10,
+            "row": 4,
+            "width": 3,
+            "height": 3
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.area"
+          },
+          "rawConfiguration": {
+            "facet": {
+              "showOtherSeries": false
+            },
+            "legend": {
+              "enabled": true
+            },
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  <YOUR ACCOUNT ID>
+                ],
+                "query": "SELECT average(`instance.blockedProcessesCount`) as 'Blocked processes' FROM MssqlInstanceSample TIMESERIES auto"
+              }
+            ],
+            "platformOptions": {
+              "ignoreTimeRange": false
+            }
+          }
+        },
+        {
+          "title": "Locking Sessions",
+          "layout": {
+            "column": 1,
+            "row": 7,
+            "width": 12,
+            "height": 2
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.table"
+          },
+          "rawConfiguration": {
+            "dataFormatters": [],
+            "facet": {
+              "showOtherSeries": false
+            },
+            "nrqlQueries": [
+              {
+                "accountId": <YOUR ACCOUNT ID>,
+                "query": "FROM MssqlCustomQuerySample SELECT earliest(timestamp) AS 'Start Time', latest(timestamp) AS 'End Time' where MSSQL_customType = 'Locks' FACET MSSQL_blocking_spid AS 'Blocking SPID', MSSQL_waiter_spid AS 'Waiting SPID', MSSQL_blocking_text AS 'Blocking SQL', MSSQL_waiter_text AS 'Waiting SQL', MSSQL_database_name AS 'Database'"
+              }
+            ]
+          }
+        },
+        {
+          "title": "Logs",
+          "layout": {
+            "column": 1,
+            "row": 9,
+            "width": 12,
+            "height": 5
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.table"
+          },
+          "rawConfiguration": {
+            "dataFormatters": [],
+            "facet": {
+              "showOtherSeries": false
+            },
+            "nrqlQueries": [
+              {
+                "accountId": <YOUR ACCOUNT ID>,
+                "query": "SELECT entityName AS 'Instance', message FROM Log WHERE `sql-server-log` = 'true'"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Top SQL",
+      "description": null,
+      "widgets": [
+        {
+          "title": "Top instances",
+          "layout": {
+            "column": 1,
+            "row": 1,
+            "width": 2,
+            "height": 3
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.bar"
+          },
+          "rawConfiguration": {
+            "facet": {
+              "showOtherSeries": false
+            },
+            "nrqlQueries": [
+              {
+                "accountId": <YOUR ACCOUNT ID>,
+                "query": "FROM MssqlCustomQuerySample SELECT sum(MSSQL_elapsed_time_ms)/1000 AS 'Elapsed Time (sec)' FACET entityName"
+              }
+            ]
+          }
+        },
+        {
+          "title": "Top SQL Average response times",
+          "layout": {
+            "column": 3,
+            "row": 1,
+            "width": 5,
+            "height": 3
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.line"
+          },
+          "rawConfiguration": {
+            "legend": {
+              "enabled": true
+            },
+            "nrqlQueries": [
+              {
+                "accountId": <YOUR ACCOUNT ID>,
+                "query": "FROM MssqlCustomQuerySample SELECT average(MSSQL_elapsed_time_ms)/1000 as 'Elapsed Time sec', average(MSSQL_worker_time_ms)/1000 as 'CPU Time sec' TIMESERIES WHERE MSSQL_customType = 'TopSQL'"
+              }
+            ],
+            "yAxisLeft": {
+              "zero": true
+            }
+          }
+        },
+        {
+          "title": "Instance Wait Times (sec)",
+          "layout": {
+            "column": 8,
+            "row": 1,
+            "width": 5,
+            "height": 3
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.area"
+          },
+          "rawConfiguration": {
+            "facet": {
+              "showOtherSeries": false
+            },
+            "legend": {
+              "enabled": true
+            },
+            "nrqlQueries": [
+              {
+                "accountId": <YOUR ACCOUNT ID>,
+                "query": "FROM MssqlCustomQuerySample SELECT sum(MSSQL_wait_time_ms)/1000 FACET MSSQL_wait_type WHERE MSSQL_customType = 'WaitState' TIMESERIES LIMIT MAX WHERE MSSQL_wait_type NOT IN ('KSOURCE_WAKEUP', 'LAZYWRITER_SLEEP', 'LOGMGR_QUEUE', 'MEMORY_ALLOCATION_EXT', 'ONDEMAND_TASK_QUEUE', 'PARALLEL_REDO_DRAIN_WORKER', 'PARALLEL_REDO_LOG_CACHE', 'PARALLEL_REDO_TRAN_LIST', 'PARALLEL_REDO_WORKER_SYNC', 'PARALLEL_REDO_WORKER_WAIT_WORK', 'PREEMPTIVE_OS_FLUSHFILEBUFFERS', 'PREEMPTIVE_XE_GETTARGETSTATE', 'PVS_PREALLOCATE', 'PWAIT_ALL_COMPONENTS_INITIALIZED', 'PWAIT_DIRECTLOGCONSUMER_GETNEXT', 'QDS_PERSIST_TASK_MAIN_LOOP_SLEEP', 'QDS_ASYNC_QUEUE', 'QDS_CLEANUP_STALE_QUERIES_TASK_MAIN_LOOP_SLEEP', 'QDS_SHUTDOWN_QUEUE', 'REDO_THREAD_PENDING_WORK', 'REQUEST_FOR_DEADLOCK_SEARCH', 'RESOURCE_QUEUE', 'SERVER_IDLE_CHECK', 'SLEEP_BPOOL_FLUSH', 'SLEEP_DBSTARTUP', 'SLEEP_DCOMSTARTUP', 'SLEEP_MASTERDBREADY', 'SLEEP_MASTERMDREADY', 'SLEEP_MASTERUPGRADED', 'SLEEP_MSDBSTARTUP', 'SLEEP_SYSTEMTASK', 'SLEEP_TASK', 'SLEEP_TEMPDBSTARTUP', 'SNI_HTTP_ACCEPT', 'SOS_WORK_DISPATCHER', 'SP_SERVER_DIAGNOSTICS_SLEEP', 'SQLTRACE_BUFFER_FLUSH', 'SQLTRACE_INCREMENTAL_FLUSH_SLEEP', 'SQLTRACE_WAIT_ENTRIES', 'VDI_CLIENT_OTHER', 'WAIT_FOR_RESULTS', 'WAITFOR', 'WAITFOR_TASKSHUTDOWN', 'WAIT_XTP_RECOVERY', 'WAIT_XTP_HOST_WAIT', 'WAIT_XTP_OFFLINE_CKPT_NEW_LOG', 'WAIT_XTP_CKPT_CLOSE', 'XE_DISPATCHER_JOIN', 'XE_DISPATCHER_WAIT', 'XE_TIMER_EVENT', 'PWAIT_EXTENSIBILITY_CLEANUP_TASK', 'HADR_FILESTREAM_IOMGR_IOCOMPLETION', 'DIRTY_PAGE_POLL', 'CHECKPOINT_QUEUE', 'FT_IFTS_SCHEDULER_IDLE_WAIT', 'BROKER_TO_FLUSH', 'BROKER_TASK_STOP') AND MSSQL_wait_time_ms > 0"
+              }
+            ]
+          }
+        },
+        {
+          "title": "Top databases",
+          "layout": {
+            "column": 1,
+            "row": 4,
+            "width": 2,
+            "height": 3
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.bar"
+          },
+          "rawConfiguration": {
+            "facet": {
+              "showOtherSeries": false
+            },
+            "nrqlQueries": [
+              {
+                "accountId": <YOUR ACCOUNT ID>,
+                "query": "FROM MssqlCustomQuerySample SELECT sum(MSSQL_elapsed_time_ms)/1000 AS 'Elapsed Time (sec)' FACET MSSQL_database_name WHERE MSSQL_database_name != ''"
+              }
+            ]
+          }
+        },
+        {
+          "title": "Total Top SQL Executions",
+          "layout": {
+            "column": 3,
+            "row": 4,
+            "width": 5,
+            "height": 3
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.line"
+          },
+          "rawConfiguration": {
+            "legend": {
+              "enabled": true
+            },
+            "nrqlQueries": [
+              {
+                "accountId": <YOUR ACCOUNT ID>,
+                "query": "FROM MssqlCustomQuerySample SELECT sum(MSSQL_execution_count) AS 'Top SQL executions' TIMESERIES"
+              }
+            ],
+            "yAxisLeft": {
+              "zero": true
+            }
+          }
+        },
+        {
+          "title": "Top SQL Reads/Writes",
+          "layout": {
+            "column": 8,
+            "row": 4,
+            "width": 5,
+            "height": 3
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.line"
+          },
+          "rawConfiguration": {
+            "legend": {
+              "enabled": true
+            },
+            "nrqlQueries": [
+              {
+                "accountId": <YOUR ACCOUNT ID>,
+                "query": "SELECT average(MSSQL_logical_reads) as 'Average Logical Reads', average(MSSQL_logical_writes) as 'Average Logical Writes', average(MSSQL_physical_reads) as 'Average Physical Reads' FROM MssqlCustomQuerySample WHERE MSSQL_customType = 'TopSQL' TIMESERIES "
+              }
+            ],
+            "yAxisLeft": {
+              "zero": true
+            }
+          }
+        },
+        {
+          "title": "",
+          "layout": {
+            "column": 1,
+            "row": 7,
+            "width": 12,
+            "height": 1
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.table"
+          },
+          "rawConfiguration": {
+            "dataFormatters": [],
+            "facet": {
+              "showOtherSeries": false
+            },
+            "nrqlQueries": [
+              {
+                "accountId": <YOUR ACCOUNT ID>,
+                "query": "FROM MssqlCustomQuerySample SELECT sum(MSSQL_elapsed_time_ms)/1000 AS 'Total Elapsed Time (sec)' FACET MSSQL_sql_text AS 'SQL Text' LIMIT 1 ORDER BY 'Total Elapsed Time (sec)'"
+              }
+            ]
+          }
+        },
+        {
+          "title": "Top SQL",
+          "layout": {
+            "column": 1,
+            "row": 8,
+            "width": 12,
+            "height": 5
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.table"
+          },
+          "rawConfiguration": {
+            "dataFormatters": [],
+            "facet": {
+              "showOtherSeries": false
+            },
+            "nrqlQueries": [
+              {
+                "accountId": <YOUR ACCOUNT ID>,
+                "query": "FROM MssqlCustomQuerySample SELECT sum(MSSQL_elapsed_time_ms)/1000 AS 'Total Elapsed (sec)', average(MSSQL_elapsed_time_ms) AS 'Avg Elapsed (ms)', sum(MSSQL_execution_count) AS 'Executions', sum(MSSQL_logical_reads) AS 'Logical Reads', sum(MSSQL_logical_writes) AS 'Logical Writes', sum(MSSQL_physical_reads) AS 'Physical Reads', latest(MSSQL_max_plan_generation_num) AS 'No. Plans', average(MSSQL_rows) AS 'Avg Rows' WHERE MSSQL_sql_handle IS NOT NULL FACET MSSQL_sql_handle, capture(MSSQL_sql_text, r'(?P<shortText>.{30}).*') LIMIT 20"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "variables": []
+}
